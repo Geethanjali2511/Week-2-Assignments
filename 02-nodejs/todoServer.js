@@ -20,6 +20,7 @@
     Description: Creates a new todo item.
     Request Body: JSON object representing the todo item.
     Response: 201 Created with the ID of the created todo item in JSON format. eg: {id: 1}
+    /*
     Example: POST http://localhost:3000/todos
     Request Body: { "title": "Buy groceries", "completed": false, description: "I should buy groceries" }
     
@@ -39,11 +40,118 @@
 
   Testing the server - run `npm run test-todoServer` command in terminal
  */
-const express = require('express');
-const bodyParser = require('body-parser');
-
+const express = require("express");
+const bodyParser = require("body-parser");
+const port = 3001;
 const app = express();
 
 app.use(bodyParser.json());
+var count = 0;
+var arr = [
+  
+];
+
+function todo() {
+  return arr;
+}
+
+function todoId(idNum) {
+  var matchedItem = null;
+  for (let i = 0; i < arr.length; i++) {
+    if (idNum === arr[i].id) {
+      matchedItem = arr[i];
+      break;
+    }
+  }
+  return matchedItem;
+}
+function todoDelete(idNum) {
+  var matchedDeleteItem = null;
+  for (let i = 0; i < arr.length; i++) {
+    if (idNum === arr[i].id) {
+      matchedDeleteItem = arr[i];
+      break;
+    }
+  }
+  return matchedDeleteItem;
+}
+
+function todoP(todoItem) {
+  todoItem["id"]=++count;
+  arr.push(todoItem);
+  
+  return count;
+}
+
+function todos(req, res) {
+  var todosList = todo();
+  console.log(todosList);
+  res.send(todosList);
+}
+app.get("/todos", todos);
+
+function todosId(req, res) {
+  const idNum = parseInt(req.params.id);
+  console.log(idNum);
+  var todosListId = todoId(idNum);
+  console.log(todosListId);
+  if (todosListId !== null) {
+    res.send(todosListId);
+  } else {
+    res.status(404).send("no such id is available");
+  }
+}
+app.get("/todos/:id", todosId);
+
+function todosP(req, res) {
+  var todoItem = req.body;
+  var ItemId = todoP(todoItem);
+  console.log(ItemId);
+
+  var answerObject = {
+    "id": ItemId,
+  };
+  res.status(201).send(answerObject);
+}
+app.post("/todos", todosP);
+
+function todosPut(req, res) {
+  const idNum = parseInt(req.params.id);
+  console.log(idNum);
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id === idNum) {
+      arr[i].completed = true;
+      res.send(arr[i]);
+      break;
+    } else {
+      res.status(404).send(arr[i].completed = false);
+
+    }
+  }
+  return arr;
+}
+app.put("/todos/:id", todosPut);
+
+
+
+function todosDelete(req, res) {
+  const idNum = parseInt(req.params.id);
+  console.log(idNum);
+  var todosListDelete = todoDelete(idNum);
+  console.log(todosListDelete);
+  if (todosListDelete !== null) {
+    arr = arr.filter(item => item.id !== todosListDelete.id);
+    console.log("Going to delete", arr)
+    res.send("This item is deleted");
+  } else {
+    res.status(404).send("no such id is available");
+  }
+}
+app.delete("/todos/:id", todosDelete);
+
+function started() {
+  console.log(`Example app listening on port ${port}`);
+}
+app.listen(port, started);
 
 module.exports = app;

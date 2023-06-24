@@ -82,9 +82,7 @@ describe('API Endpoints', () => {
       expect(response.statusCode).toBe(404);
       expect(response.body).toBe('File not found');
     });
-
   });
-
   describe('Invalid Routes', () => {
     test('should return 404 for invalid routes', async () => {
       const options = {
